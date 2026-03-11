@@ -1,4 +1,4 @@
-const { Class, Waitlist } = require("../models");
+const { Class, Waitlist, Student } = require("../models");
 const { Op } = require("sequelize");
 
 class ClassController {
@@ -109,24 +109,80 @@ class ClassController {
         try {
             console.log('get class waitlist by id ', req.params.id);
 
-            let waitlistId = req.params.id;
+            let classId = req.params.id;
+            let { limit, offset } = req.query;
 
-            const data = await Waitlist.findByPk(classId, {
+            let options = {
+                where: {
+                    class_id: classId
+                },
+                include: [
+                    {
+                        model: Student,
+                        as: "Student",
+                    }
+                ],
                 transaction: t
-            });
+            };
 
-            if (!data) {
+            // jika ada limit
+            if (limit) {
+                options.limit = parseInt(limit);
+            }
+
+            // jika ada offset
+            if (offset) {
+                options.offset = parseInt(offset);
+            }
+
+            const datasWaitlist = await Waitlist.findAll(options);
+
+
+            if (datasWaitlist.length === 0) {
                 await t.rollback();
                 return res.status(404).json({
-                    message: "Waitlist not found"
+                    message: "Class Waitlist not found"
                 });
             }
 
             await t.commit();
 
+            //Sort data waitlist priority
+            console.log("Data waitlist before sorting: ", datasWaitlist);
+
+            // datasWaitlist.forEach(data => {
+            //     let dataStudent = data.dataValues.Student;
+
+            //     console.log("Data student: ", dataStudent.dataValues.priority_level);
+            // });
+
+            const priorityOrder = {
+                special_program: 1,
+                scholarship: 2,
+                regular: 3
+            };
+            
+            datasWaitlist.sort((a, b) => {
+            
+                let priorityA = priorityOrder[a.dataValues.Student.dataValues.priority_level];
+                let priorityB = priorityOrder[b.dataValues.Student.dataValues.priority_level];
+            
+                return priorityA - priorityB;
+            
+            });
+
+            datasWaitlist.forEach(data => {
+
+                let dataStudent = data.dataValues.Student;
+            
+                console.log("Student name:", dataStudent.dataValues.name);
+                console.log("Priority level:", dataStudent.dataValues.priority_level);
+            
+            });
+
             res.status(200).json({
-                message: `Get class ID ${classId} successfully`,
-                data: data
+                message: `Get class waitlist id ${classId} successfully`,
+                data: datasWaitlist
             });
         } catch (error) {
 

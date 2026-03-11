@@ -70,10 +70,14 @@ class EnrollmentController {
                 }, { transaction: t });
 
                 //Insert ke waitlist
+                console.log('sudentd iddddd ', req.body.student_id);
                 dataWaitlist = await Waitlist.create({
                     request_id: dataEnrollmentRequest.id,
+                    class_id: req.body.class_id,
+                    student_id: req.body.student_id,
                     position: "student",
                 }, { transaction: t });
+
                 await t.commit();
                 return res.status(201).json({
                     message: "Enrollment Request added successfully",
@@ -156,13 +160,6 @@ class EnrollmentController {
                 }
 
             }
-
-            await t.commit();
-
-            res.status(201).json({
-                message: "Enrollment Request added successfully",
-                data: dataEnrollmentRequest
-            });
         } catch (error) {
             await t.rollback();
             res.status(400).json({

@@ -13,10 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       Class.hasMany(models.EnrollmentRequest, {
         foreignKey: 'class_id'
       });
-
       Class.hasMany(models.Enrollment, {
         foreignKey: 'class_id'
       });
+      Class.hasMany(models.Waitlist, {
+        foreignKey: 'class_id'
+      })
     }
   }
 

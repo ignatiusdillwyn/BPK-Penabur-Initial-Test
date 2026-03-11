@@ -18,6 +18,24 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      class_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Class',   // nama tabel
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      student_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Student',   // nama tabel
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
       position: {
         type: Sequelize.STRING
       },

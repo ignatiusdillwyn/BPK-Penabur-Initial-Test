@@ -7,8 +7,10 @@ module.exports = (sequelize, DataTypes) => {
       Student.hasMany(models.Enrollment, {
         foreignKey: "student_id"
       });
-
       Student.hasMany(models.EnrollmentRequest, {
+        foreignKey: "student_id"
+      });
+      Student.hasMany(models.Waitlist, {
         foreignKey: "student_id"
       });
     }
