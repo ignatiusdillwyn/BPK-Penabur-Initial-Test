@@ -5,8 +5,6 @@ class ClassController {
     static async getAllClasses(req, res) {
         const t = await Class.sequelize.transaction();
         try {
-            console.log('get all classes');
-
             let { limit, offset } = req.query;
 
             let options = {
@@ -45,23 +43,83 @@ class ClassController {
         try {
             console.log('add class');
 
-            const data = await Class.create({
-                subject_id: req.body.subject_id,
-                teacher_id: req.body.teacher_id,
-                max_capacity: req.body.max_capacity,
-                schedule_day: req.body.schedule_day,
-                schedule_start: req.body.schedule_start,
-                schedule_end: req.body.schedule_end,
-                room: req.body.room,
-                status: req.body.status,
-            }, { transaction: t });
+            //Cek apakah jadwal guru bertabrakan dengan kelas lain
+            let teacherId = req.body.teacher_id;
 
-            await t.commit();
+            let options = {
+                where: {
+                    teacher_id: teacherId
+                },
+                transaction: t
+            };
 
-            res.status(201).json({
-                message: "Class added successfully",
-                data: data
-            });
+            const dataClassFromDB = await Class.findAll(options);
+            console.log('data classsss teacher ', dataClassFromDB);
+
+            if (dataClassFromDB.length === 0) {
+                await t.rollback();
+                return res.status(404).json({
+                    message: `Class with teacher id ${teacherId} not found`
+                });
+            }
+
+            let isSchedule_Clash = false;
+
+            for (const data of dataClassFromDB) {
+
+                let classFromDB = data;
+
+                let dayDB = classFromDB.schedule_day;
+                let startDB = classFromDB.schedule_start;
+                let endDB = classFromDB.schedule_end;
+
+                let dayReq = req.body.schedule_day;
+                let startReq = req.body.schedule_start;
+                let endReq = req.body.schedule_end;
+
+                if (
+                    new Date(dayDB).toDateString() ===
+                    new Date(dayReq).toDateString()
+                ) {
+
+                    let startDBTime = new Date(`1970-01-01T${startDB}`);
+                    let endDBTime = new Date(`1970-01-01T${endDB}`);
+
+                    let startReqTime = new Date(`1970-01-01T${startReq}`);
+                    let endReqTime = new Date(`1970-01-01T${endReq}`);
+
+                    if (startReqTime < endDBTime && endReqTime > startDBTime) {
+                        console.log("JADWAL BENTROK");
+                        isSchedule_Clash = true;
+                        break;
+                    }
+
+                }
+            }
+
+            if (isSchedule_Clash) {
+                return res.status(400).json({
+                    message: `Teacher with id ${teacherId} has a schedule clash on ${req.body.schedule_day} from ${req.body.schedule_start} to ${req.body.schedule_end}`
+                });
+            } else {
+                const data = await Class.create({
+                    subject_id: req.body.subject_id,
+                    teacher_id: req.body.teacher_id,
+                    max_capacity: req.body.max_capacity,
+                    schedule_day: req.body.schedule_day,
+                    schedule_start: req.body.schedule_start,
+                    schedule_end: req.body.schedule_end,
+                    room: req.body.room,
+                    status: req.body.status,
+                }, { transaction: t });
+
+                await t.commit();
+
+                res.status(201).json({
+                    message: "Class added successfully",
+                    // data: data
+                });
+            }
         } catch (error) {
             await t.rollback();
             res.status(400).json({
@@ -161,23 +219,23 @@ class ClassController {
                 scholarship: 2,
                 regular: 3
             };
-            
+
             datasWaitlist.sort((a, b) => {
-            
+
                 let priorityA = priorityOrder[a.dataValues.Student.dataValues.priority_level];
                 let priorityB = priorityOrder[b.dataValues.Student.dataValues.priority_level];
-            
+
                 return priorityA - priorityB;
-            
+
             });
 
             datasWaitlist.forEach(data => {
 
                 let dataStudent = data.dataValues.Student;
-            
+
                 console.log("Student name:", dataStudent.dataValues.name);
                 console.log("Priority level:", dataStudent.dataValues.priority_level);
-            
+
             });
 
             res.status(200).json({

@@ -155,8 +155,6 @@ class EnrollmentController {
                         message: "Enrollment Request added successfully",
                         data: dataEnrollmentRequest
                     });
-
-                    //Update current capacity di class
                 }
 
             }
@@ -169,26 +167,40 @@ class EnrollmentController {
     }
 
     static async cancelEnrollment(req, res) {
-        const t = await Enrollment.sequelize.transaction();
+        const t = await EnrollmentRequest.sequelize.transaction();
         try {
             console.log('cancel enrollment by id ', req.params.id);
 
-            let enrollmentId = req.params.id;
+            let enrollmentReqId = req.params.id;
 
-            const data = await Enrollment.findByPk(enrollmentId);
+            const data = await EnrollmentRequest.findByPk(enrollmentReqId);
             if (!data) {
                 await t.rollback();
                 return res.status(404).json({
-                    message: "Enrollment not found"
+                    message: "Enrollment Request not found"
                 });
             }
 
-            await data.destroy();
+            //Update status menjadi cancelled
+            await data.update(
+                {
+                    status: "cancelled"
+                },
+                { transaction: t }
+            );
+
+            //Hapus Data dari Waitlist
+            await Waitlist.destroy({
+                where: {
+                    request_id: enrollmentReqId,
+                },
+                transaction: t
+            });
 
             await t.commit();
 
             res.status(200).json({
-                message: `Enrollment ID ${enrollmentId} deleted successfully`,
+                message: `Enrollment ID ${enrollmentReqId} has been canceled`,
                 data: data
             });
         } catch (error) {
