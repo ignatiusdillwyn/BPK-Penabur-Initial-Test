@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Waitlist.belongsTo(models.EnrollmentRequest, { foreignKey: "request_id" })
     }
   }
   Waitlist.init({

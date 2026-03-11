@@ -10,7 +10,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       request_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'EnrollmentRequest',   // nama tabel
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       position: {
         type: Sequelize.STRING

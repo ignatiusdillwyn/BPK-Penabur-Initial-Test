@@ -4,8 +4,13 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Student extends Model {
     static associate(models) {
-      Student.hasMany(models.Enrollment)
-      Student.hasMany(models.EnrollmentRequest)
+      Student.hasMany(models.Enrollment, {
+        foreignKey: "student_id"
+      });
+
+      Student.hasMany(models.EnrollmentRequest, {
+        foreignKey: "student_id"
+      });
     }
   }
 
@@ -62,6 +67,12 @@ module.exports = (sequelize, DataTypes) => {
           msg: "status cannot be empty"
         }
       }
+    },
+
+    credit: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
 
   }, {

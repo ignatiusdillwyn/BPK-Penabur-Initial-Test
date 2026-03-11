@@ -3,9 +3,9 @@ const { Op } = require("sequelize");
 
 class ClassController {
     static async getAllClasses(req, res) {
-        const t = await Student.sequelize.transaction();
+        const t = await Class.sequelize.transaction();
         try {
-            console.log('get all students');
+            console.log('get all classes');
 
             let { limit, offset } = req.query;
 
@@ -23,12 +23,12 @@ class ClassController {
                 options.offset = parseInt(offset);
             }
 
-            const data = await Student.findAll(options);
+            const data = await Class.findAll(options);
 
             await t.commit();
 
             res.status(200).json({
-                message: "Get all students successfully",
+                message: "Get all classes successfully",
                 data: data
             });
         } catch (error) {
@@ -41,22 +41,25 @@ class ClassController {
     }
 
     static async addClass(req, res) {
-        const t = await Student.sequelize.transaction();
+        const t = await Class.sequelize.transaction();
         try {
-            console.log('add student');
+            console.log('add class');
 
-            const data = await Student.create({
-                student_number: req.body.student_number,
-                name: req.body.name,
-                grade_level: req.body.grade_level,
-                priority_level: req.body.priority_level,
+            const data = await Class.create({
+                subject_id: req.body.subject_id,
+                teacher_id: req.body.teacher_id,
+                max_capacity: req.body.max_capacity,
+                schedule_day: req.body.schedule_day,
+                schedule_start: req.body.schedule_start,
+                schedule_end: req.body.schedule_end,
+                room: req.body.room,
                 status: req.body.status,
             }, { transaction: t });
 
             await t.commit();
 
             res.status(201).json({
-                message: "Student added successfully",
+                message: "Class added successfully",
                 data: data
             });
         } catch (error) {
@@ -68,27 +71,27 @@ class ClassController {
     }
 
     static async getClassById(req, res) {
-        const t = await Student.sequelize.transaction();
+        const t = await Class.sequelize.transaction();
         try {
-            console.log('get student by id ', req.params.id);
+            console.log('get class by id ', req.params.id);
 
-            let studentId = req.params.id;
+            let classId = req.params.id;
 
-            const data = await Student.findByPk(studentId, {
+            const data = await Class.findByPk(classId, {
                 transaction: t
             });
 
             if (!data) {
                 await t.rollback();
                 return res.status(404).json({
-                    message: "Student not found"
+                    message: "Class not found"
                 });
             }
 
             await t.commit();
 
             res.status(200).json({
-                message: `Get student ID ${studentId} successfully`,
+                message: `Get class ID ${classId} successfully`,
                 data: data
             });
         } catch (error) {

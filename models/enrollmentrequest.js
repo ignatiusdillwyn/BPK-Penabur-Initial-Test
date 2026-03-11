@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       EnrollmentRequest.belongsTo(models.Student, { foreignKey: "student_id" })
       EnrollmentRequest.belongsTo(models.Class, { foreignKey: "class_id" })
+      EnrollmentRequest.hasOne(models.Waitlist, { foreignKey: "request_id" })
     }
   }
 
@@ -23,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     student_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'student_id',
       validate: {
         notNull: {
           msg: "student_id is required"
@@ -36,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     class_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'class_id',
       validate: {
         notNull: {
           msg: "class_id is required"
@@ -75,15 +78,6 @@ module.exports = (sequelize, DataTypes) => {
 
     allow_waitlist: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: "allow_waitlist is required"
-        },
-        isBoolean: {
-          msg: "allow_waitlist must be true or false"
-        }
-      }
     }
 
   }, {

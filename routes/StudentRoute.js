@@ -17,4 +17,10 @@ studentRouter.get(
     StudentController.getStudentById
 );
 
+studentRouter.get(
+    "/students/:id/enrollments",
+    authentication,
+    StudentController.getAllStudentEnrollments
+);
+
 module.exports = studentRouter;

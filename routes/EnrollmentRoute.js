@@ -5,12 +5,12 @@ const enrollmentRouter = require("express").Router();
 enrollmentRouter.post(
     "/enrollment-requests",
     authentication,
-    EnrollmentController.addStudent
+    EnrollmentController.addEnrollmentRequest
 );
 enrollmentRouter.post(
     "/enrollments/:id/cancel",
     authentication,
-    EnrollmentController.getStudentById
+    EnrollmentController.cancelEnrollment
 );
 
 module.exports = enrollmentRouter;

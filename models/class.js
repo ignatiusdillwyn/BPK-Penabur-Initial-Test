@@ -7,7 +7,9 @@ module.exports = (sequelize, DataTypes) => {
       Class.belongsTo(models.Teacher, {
         foreignKey: 'teacher_id'
       });
-
+      Class.belongsTo(models.Subject, {
+        foreignKey: 'subject_id'
+      });
       Class.hasMany(models.EnrollmentRequest, {
         foreignKey: 'class_id'
       });
@@ -48,21 +50,26 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
 
-    capacity: {
+    max_capacity: {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notNull: {
-          msg: "capacity cannot be null"
+          msg: "max capacity cannot be null"
         },
         isInt: {
-          msg: "capacity must be a number"
+          msg: "max capacity must be a number"
         },
         min: {
           args: [1],
-          msg: "capacity must be at least 1"
+          msg: "max capacity must be at least 1"
         }
       }
+    },
+
+    current_capacity: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
 
     schedule_day: {

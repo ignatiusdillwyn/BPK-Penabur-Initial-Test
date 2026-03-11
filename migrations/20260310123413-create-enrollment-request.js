@@ -42,8 +42,6 @@ module.exports = {
 
       status: {
         type: Sequelize.ENUM('pending', 'enrolled', 'waitlisted', 'rejected', 'cancelled'),
-        allowNull: false,
-        defaultValue: 'pending'
       },
 
       allow_waitlist: {

@@ -11,7 +11,11 @@ module.exports = {
       },
 
       subject_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Subject', // nama tabel yang direferensikan
+          key: 'id'
+        },
       },
 
       teacher_id: {
@@ -25,7 +29,11 @@ module.exports = {
         onDelete: 'SET NULL'
       },
 
-      capacity: {
+      max_capacity: {
+        type: Sequelize.INTEGER
+      },
+
+      current_capacity: {
         type: Sequelize.INTEGER
       },
 

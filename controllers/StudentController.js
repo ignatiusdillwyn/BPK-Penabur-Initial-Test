@@ -1,4 +1,4 @@
-const { Student } = require("../models");
+const { Student, EnrollmentRequest, Enrollment } = require("../models");
 const { Op } = require("sequelize");
 
 class StudentController {
@@ -91,6 +91,49 @@ class StudentController {
                 message: `Get student ID ${studentId} successfully`,
                 data: data
             });
+        } catch (error) {
+
+            await t.rollback();
+
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    }
+
+    static async getAllStudentEnrollments(req, res) {
+        const t = await Enrollment.sequelize.transaction();
+
+        try {
+            console.log('get student enrollments');
+
+            let { limit, offset } = req.query;
+            let studentId = req.params.id;
+
+            let options = {
+                where: {
+                    student_id: studentId
+                },
+                transaction: t
+            };
+
+            if (limit) {
+                options.limit = parseInt(limit);
+            }
+
+            if (offset) {
+                options.offset = parseInt(offset);
+            }
+
+            const data = await Enrollment.findAll(options);
+
+            await t.commit();
+
+            res.status(200).json({
+                message: "Get student enrollments successfully",
+                data: data
+            });
+
         } catch (error) {
 
             await t.rollback();
