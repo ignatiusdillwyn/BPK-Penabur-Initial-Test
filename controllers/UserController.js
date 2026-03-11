@@ -38,15 +38,13 @@ class UserController {
     try {
       // console.log("req.body:", req.body);
 
-      let { email, password, username, image } = req.body;
+      let { email, password } = req.body;
       password = encryptPwd(password);
 
       // console.log("Encrypted Password:", password);
       const user = await User.create({
         email,
         password,
-        username,
-        image,
       });
 
       res.status(201).json({
@@ -54,8 +52,6 @@ class UserController {
         user: {
           id: user.id,
           email: user.email,
-          username: user.username,
-          image: user.image,
         },
       });
     } catch (error) {

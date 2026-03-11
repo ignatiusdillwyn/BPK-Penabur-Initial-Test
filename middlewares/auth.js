@@ -1,4 +1,3 @@
-const { Product } = require("../models/");
 const { tokenVerifier } = require("../helpers/jwt");
 
 const authentication = (req, res, next) => {
@@ -17,33 +16,33 @@ const authentication = (req, res, next) => {
   }
 };
 
-const authorization = async (req, res, next) => {
-  console.log("Authorization");
-  try {
-    const id = +req.params.id;
-    const UserId = req.userData.id;
-    const product = await Product.findOne({
-      where: { id },
-    });
-    if (product) {
-      if (product.UserId === UserId) {
-        next();
-      } else {
-        throw {
-          message: "You are not allowed.",
-        };
-      }
-    } else {
-      throw {
-        message: "Item not found",
-      };
-    }
-  } catch (err) {
-    res.send(err);
-  }
-};
+// const authorization = async (req, res, next) => {
+//   console.log("Authorization");
+//   try {
+//     const id = +req.params.id;
+//     const UserId = req.userData.id;
+//     const product = await Product.findOne({
+//       where: { id },
+//     });
+//     if (product) {
+//       if (product.UserId === UserId) {
+//         next();
+//       } else {
+//         throw {
+//           message: "You are not allowed.",
+//         };
+//       }
+//     } else {
+//       throw {
+//         message: "Item not found",
+//       };
+//     }
+//   } catch (err) {
+//     res.send(err);
+//   }
+// };
 
 module.exports = {
   authentication,
-  authorization,
+  // authorization,
 };

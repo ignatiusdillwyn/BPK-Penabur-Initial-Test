@@ -2,20 +2,27 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Student', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      email: {
+      student_number: {
         type: Sequelize.STRING
       },
-      password: {
+      name: {
         type: Sequelize.STRING
       },
-      image: {
+      grade_level: {
+        type: Sequelize.STRING
+      },
+      priority_level: {
+        type: Sequelize.ENUM('regular', 'scholarship', 'special_program'),
+        allowNull: false
+      },
+      status: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -28,7 +35,11 @@ module.exports = {
       }
     });
   },
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Student');
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Student_priority_level";'
+    );
   }
 };

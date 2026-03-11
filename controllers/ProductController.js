@@ -31,6 +31,7 @@ class ProductController {
                 UserId: userId,
                 image: ""
             });
+            
             res.status(201).json({
                 message: "Product created successfully",
                 data: data
