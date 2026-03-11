@@ -9,40 +9,58 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+
       subject_id: {
         type: Sequelize.INTEGER
       },
+
       teacher_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Teacher', // nama tabel yang direferensikan
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
+
       capacity: {
         type: Sequelize.INTEGER
       },
+
       schedule_day: {
         type: Sequelize.DATE
       },
+
       schedule_start: {
         type: Sequelize.TIME
       },
+
       schedule_end: {
         type: Sequelize.TIME
       },
+
       room: {
         type: Sequelize.STRING
       },
+
       status: {
         type: Sequelize.STRING
       },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
+
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
       }
     });
   },
+
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Class');
   }

@@ -1,20 +1,20 @@
 const { StudentController } = require("../controllers");
 const { authentication } = require("../middlewares/auth");
-const productRouter = require("express").Router();
+const studentRouter = require("express").Router();
 
-productRouter.get("/students",
+studentRouter.get("/students",
     authentication,
     StudentController.getAllStudents
 );
-productRouter.post(
+studentRouter.post(
     "/students",
     authentication,
     StudentController.addStudent
 );
-productRouter.get(
+studentRouter.get(
     "/students/:id",
     authentication,
     StudentController.getStudentById
 );
 
-module.exports = productRouter;
+module.exports = studentRouter;
