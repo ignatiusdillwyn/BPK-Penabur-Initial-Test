@@ -1,11 +1,32 @@
-const { Enrollment, EnrollmentRequest, Class, Waitlist, Student, Subject } = require("../models");
+const { Enrollment, EnrollmentRequest, Class, Waitlist, Student, Subject, IdempotencyKey } = require("../models");
 const { Op } = require("sequelize");
 
 class EnrollmentController {
-    
+
     static async addEnrollmentRequest(req, res) {
         const t = await EnrollmentRequest.sequelize.transaction();
         try {
+            //Check idempotency key
+            const idempotencyKey = req.headers["idempotency-key"];
+
+            if (!idempotencyKey) {
+                await t.rollback();
+                return res.status(400).json({
+                    message: "Idempotency-Key header is required"
+                });
+            }
+
+            // cek apakah request sudah pernah diproses
+            const existingKey = await IdempotencyKey.findOne({
+                where: { key: idempotencyKey },
+                transaction: t
+            });
+
+            if (existingKey) {
+                await t.rollback();
+                return res.status(200).json(existingKey.response);
+            }
+
             console.log('add enrollment request');
             let dataEnrollmentRequest = null
             //Get Class by Id
@@ -45,11 +66,21 @@ class EnrollmentController {
                     status: "rejected",
                     allow_waitlist: false,
                 }, { transaction: t });
-                await t.commit();
-                return res.status(201).json({
+
+                const response = {
                     message: "Enrollment Request added successfully",
                     data: dataEnrollmentRequest
-                });
+                }
+
+                //Create idempotency key
+                await IdempotencyKey.create({
+                    key: idempotencyKey,
+                    response: response
+                }, { transaction: t });
+
+                await t.commit();
+
+                return res.status(201).json(response);
             }
 
             let class_max_capacity = dataClass.max_capacity;
@@ -78,11 +109,20 @@ class EnrollmentController {
                     position: "student",
                 }, { transaction: t });
 
-                await t.commit();
-                return res.status(201).json({
+                const response = {
                     message: "Enrollment Request added successfully",
                     data: dataEnrollmentRequest
-                });
+                }
+
+                //Create idempotency key
+                await IdempotencyKey.create({
+                    key: idempotencyKey,
+                    response: response
+                }, { transaction: t });
+
+                await t.commit();
+
+                return res.status(201).json(response);
             } else {
                 //Cek Apakah Jadwal Bertabarakan
                 //Get Data Enrollment Request by Student Id
@@ -135,11 +175,21 @@ class EnrollmentController {
                         status: "rejected",
                         allow_waitlist: false,
                     }, { transaction: t });
-                    await t.commit();
-                    return res.status(201).json({
+
+                    const response = {
                         message: "Enrollment Request added successfully",
                         data: dataEnrollmentRequest
-                    });
+                    }
+
+                    //Create idempotency key
+                    await IdempotencyKey.create({
+                        key: idempotencyKey,
+                        response: response
+                    }, { transaction: t });
+
+                    await t.commit();
+
+                    return res.status(201).json(response);
                 } else {
                     console.log('Kelas masih ada kapasitas dan jadwal tidak bertabarakan, langsung enroll')
                     dataEnrollmentRequest = await EnrollmentRequest.create({
@@ -150,13 +200,22 @@ class EnrollmentController {
                         status: "pending",
                         allow_waitlist: false,
                     }, { transaction: t });
-                    await t.commit();
-                    return res.status(201).json({
+
+                    const response = {
                         message: "Enrollment Request added successfully",
                         data: dataEnrollmentRequest
-                    });
-                }
+                    }
 
+                    //Create idempotency key
+                    await IdempotencyKey.create({
+                        key: idempotencyKey,
+                        response: response
+                    }, { transaction: t });
+
+                    await t.commit();
+
+                    return res.status(201).json(response);
+                }
             }
         } catch (error) {
             await t.rollback();
