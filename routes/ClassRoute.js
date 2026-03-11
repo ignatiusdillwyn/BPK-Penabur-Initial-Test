@@ -16,5 +16,10 @@ ClassRouter.get(
     authentication,
     ClassController.getClassById
 );
+ClassRouter.get(
+    "/classes/:id/waitlist",
+    authentication,
+    ClassController.getClassWaitlistById
+);
 
 module.exports = ClassRouter;

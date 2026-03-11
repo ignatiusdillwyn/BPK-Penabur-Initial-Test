@@ -1,4 +1,4 @@
-const { Class } = require("../models");
+const { Class, Waitlist } = require("../models");
 const { Op } = require("sequelize");
 
 class ClassController {
@@ -85,6 +85,40 @@ class ClassController {
                 await t.rollback();
                 return res.status(404).json({
                     message: "Class not found"
+                });
+            }
+
+            await t.commit();
+
+            res.status(200).json({
+                message: `Get class ID ${classId} successfully`,
+                data: data
+            });
+        } catch (error) {
+
+            await t.rollback();
+
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    }
+
+    static async getClassWaitlistById(req, res) {
+        const t = await Waitlist.sequelize.transaction();
+        try {
+            console.log('get class waitlist by id ', req.params.id);
+
+            let waitlistId = req.params.id;
+
+            const data = await Waitlist.findByPk(classId, {
+                transaction: t
+            });
+
+            if (!data) {
+                await t.rollback();
+                return res.status(404).json({
+                    message: "Waitlist not found"
                 });
             }
 

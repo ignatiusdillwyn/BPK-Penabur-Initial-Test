@@ -45,6 +45,11 @@ class EnrollmentController {
                     status: "rejected",
                     allow_waitlist: false,
                 }, { transaction: t });
+                await t.commit();
+                return res.status(201).json({
+                    message: "Enrollment Request added successfully",
+                    data: dataEnrollmentRequest
+                });
             }
 
             let class_max_capacity = dataClass.max_capacity;
@@ -69,7 +74,11 @@ class EnrollmentController {
                     request_id: dataEnrollmentRequest.id,
                     position: "student",
                 }, { transaction: t });
-
+                await t.commit();
+                return res.status(201).json({
+                    message: "Enrollment Request added successfully",
+                    data: dataEnrollmentRequest
+                });
             } else {
                 //Cek Apakah Jadwal Bertabarakan
                 //Get Data Enrollment Request by Student Id
@@ -122,6 +131,11 @@ class EnrollmentController {
                         status: "rejected",
                         allow_waitlist: false,
                     }, { transaction: t });
+                    await t.commit();
+                    return res.status(201).json({
+                        message: "Enrollment Request added successfully",
+                        data: dataEnrollmentRequest
+                    });
                 } else {
                     console.log('Kelas masih ada kapasitas dan jadwal tidak bertabarakan, langsung enroll')
                     dataEnrollmentRequest = await EnrollmentRequest.create({
@@ -132,6 +146,11 @@ class EnrollmentController {
                         status: "pending",
                         allow_waitlist: false,
                     }, { transaction: t });
+                    await t.commit();
+                    return res.status(201).json({
+                        message: "Enrollment Request added successfully",
+                        data: dataEnrollmentRequest
+                    });
 
                     //Update current capacity di class
                 }
