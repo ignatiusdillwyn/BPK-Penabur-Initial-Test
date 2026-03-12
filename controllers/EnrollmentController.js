@@ -259,8 +259,9 @@ class EnrollmentController {
                 transaction: t
             })
 
+            //Hapus Data dari Waitlist
             if (dataWaitlist.length > 0) {
-                //Hapus Data dari Waitlist
+                
                 await Waitlist.destroy({
                     where: {
                         request_id: enrollmentReqId,
