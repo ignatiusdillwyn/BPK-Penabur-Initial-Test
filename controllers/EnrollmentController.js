@@ -1,5 +1,6 @@
 const { Enrollment, EnrollmentRequest, Class, Waitlist, Student, Subject, IdempotencyKey, Audit_Log } = require("../models");
 const { Op, where } = require("sequelize");
+const { all } = require("../routes");
 
 class EnrollmentController {
 
@@ -247,7 +248,8 @@ class EnrollmentController {
             //Update status menjadi cancelled
             await data.update(
                 {
-                    status: "cancelled"
+                    status: "cancelled",
+                    allow_waitlist: false,
                 },
                 { transaction: t }
             );
@@ -276,7 +278,7 @@ class EnrollmentController {
                 entity_id: enrollmentReqId,
                 action: "cancelled",
                 old_value: JSON.stringify(data.dataValues),
-                new_value: JSON.stringify({ ...data.dataValues, status: "cancelled" }),
+                new_value: JSON.stringify({ ...data.dataValues, status: "cancelled", allow_waitlist: false}),
             }, {
                 transaction: t
             })
