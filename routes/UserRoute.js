@@ -3,7 +3,7 @@ const userRouter = require("express").Router();
 
 // // CRUD Basic
 // userRouter.get("/", UserController.getUsers);
-// userRouter.post("/create", UserController.add);
+// userRouter.post("/register", UserController.register);
 // userRouter.delete("/delete/:id", UserController.delete);
 // userRouter.put("/edit/:id", UserController.edit);
 
@@ -71,5 +71,5 @@ userRouter.post("/login", UserController.login);
  *       400:
  *         description: Validation error
  */
-userRouter.post("/register", UserController.register);
+userRouter.post("/register", UserController.add);
 module.exports = userRouter;
