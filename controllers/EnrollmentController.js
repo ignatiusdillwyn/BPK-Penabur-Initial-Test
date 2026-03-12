@@ -1,4 +1,4 @@
-const { Enrollment, EnrollmentRequest, Class, Waitlist, Student, Subject, IdempotencyKey } = require("../models");
+const { Enrollment, EnrollmentRequest, Class, Waitlist, Student, Subject, IdempotencyKey, Audit_Log } = require("../models");
 const { Op } = require("sequelize");
 
 class EnrollmentController {
@@ -44,9 +44,10 @@ class EnrollmentController {
 
             console.log('data classsss ', dataClass);
 
-            //Cek Credit Siswa
+
             let studentId = req.body.student_id;
 
+            //Get Student by Id
             const dataStudent = await Student.findByPk(studentId, {
                 transaction: t
             });
@@ -56,6 +57,7 @@ class EnrollmentController {
             let studentCredit = dataStudent.credit
             let subjectCredit = subject.dataValues.credit
 
+            //Cek Credit Siswa
             if (studentCredit + subjectCredit > 24) {
                 console.log('Tidak bisa ambil kelas ini karena melebihi batas maksimal kredit')
                 dataEnrollmentRequest = await EnrollmentRequest.create({
@@ -255,6 +257,18 @@ class EnrollmentController {
                 },
                 transaction: t
             });
+
+            //Catat di Audit Log
+
+            await Audit_Log.create({
+                entity: "EnrollmentRequest",
+                entity_id: enrollmentReqId,
+                action: "cancelled",
+                old_value: JSON.stringify(data.dataValues),
+                new_value: JSON.stringify({ ...data.dataValues, status: "cancelled" }),
+            }, {
+                transaction: t
+            })
 
             await t.commit();
 
