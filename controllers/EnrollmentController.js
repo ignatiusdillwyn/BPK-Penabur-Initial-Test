@@ -1,5 +1,5 @@
 const { Enrollment, EnrollmentRequest, Class, Waitlist, Student, Subject, IdempotencyKey, Audit_Log } = require("../models");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 class EnrollmentController {
 
@@ -181,6 +181,7 @@ class EnrollmentController {
 
                     const response = {
                         message: "Enrollment Request added successfully",
+                        rejected_reason: "Schedule clash",
                         data: dataEnrollmentRequest
                     }
 
@@ -251,16 +252,24 @@ class EnrollmentController {
                 { transaction: t }
             );
 
-            //Hapus Data dari Waitlist
-            await Waitlist.destroy({
+            let dataWaitlist = await Waitlist.findAll({
                 where: {
                     request_id: enrollmentReqId,
                 },
                 transaction: t
-            });
+            })
+
+            if (dataWaitlist.length > 0) {
+                //Hapus Data dari Waitlist
+                await Waitlist.destroy({
+                    where: {
+                        request_id: enrollmentReqId,
+                    },
+                    transaction: t
+                });
+            }
 
             //Catat di Audit Log
-
             await Audit_Log.create({
                 entity: "EnrollmentRequest",
                 entity_id: enrollmentReqId,
