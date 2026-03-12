@@ -71,6 +71,7 @@ class EnrollmentController {
 
                 const response = {
                     message: "Enrollment Request added successfully",
+                    rejected_reason: "exceed credit limit",
                     data: dataEnrollmentRequest
                 }
 
@@ -158,7 +159,7 @@ class EnrollmentController {
                     if (dayDB.toString() === dayReq.toString()) {
 
                         if (startReq < endDB && endReq > startDB) {
-                            console.log("JADWAL BENTROK");
+                            console.log("schedule clash");
                             isSchedule_Clash = true;
                             break; // 🚀 stop loop
                         }
