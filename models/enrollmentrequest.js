@@ -14,13 +14,21 @@ module.exports = (sequelize, DataTypes) => {
     request_code: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true, // Menambahkan constraint unique di level database
       validate: {
         notEmpty: {
           msg: "request_code cannot be empty"
+        },
+        isUnique: async function (value) {
+          const enrollmentRequest = await EnrollmentRequest.findOne({
+            where: { request_code: value }
+          });
+          if (enrollmentRequest && enrollmentRequest.id !== this.id) {
+            throw new Error('request_code must be unique');
+          }
         }
       }
     },
-
     student_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -34,7 +42,6 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-
     class_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -48,7 +55,6 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-
     requested_at: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -61,7 +67,6 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-
     status: {
       type: DataTypes.ENUM('pending', 'enrolled', 'waitlisted', 'rejected', 'cancelled'),
       allowNull: false,
@@ -75,11 +80,9 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-
     allow_waitlist: {
       type: DataTypes.BOOLEAN,
     }
-
   }, {
     sequelize,
     modelName: 'EnrollmentRequest',

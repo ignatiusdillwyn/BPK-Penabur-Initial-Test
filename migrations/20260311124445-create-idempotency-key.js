@@ -10,7 +10,9 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       key: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false,
       },
       response: {
         type: Sequelize.JSON

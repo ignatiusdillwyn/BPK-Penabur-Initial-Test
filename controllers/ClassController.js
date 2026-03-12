@@ -56,51 +56,64 @@ class ClassController {
             const dataClassFromDB = await Class.findAll(options);
             console.log('data classsss teacher ', dataClassFromDB);
 
-            if (dataClassFromDB.length === 0) {
-                await t.rollback();
-                return res.status(404).json({
-                    message: `Class with teacher id ${teacherId} not found`
-                });
-            }
+            if (dataClassFromDB.length !== 0) {
+                let isSchedule_Clash = false;
 
-            let isSchedule_Clash = false;
+                for (const data of dataClassFromDB) {
 
-            for (const data of dataClassFromDB) {
+                    let classFromDB = data;
 
-                let classFromDB = data;
+                    let dayDB = classFromDB.schedule_day;
+                    let startDB = classFromDB.schedule_start;
+                    let endDB = classFromDB.schedule_end;
 
-                let dayDB = classFromDB.schedule_day;
-                let startDB = classFromDB.schedule_start;
-                let endDB = classFromDB.schedule_end;
+                    let dayReq = req.body.schedule_day;
+                    let startReq = req.body.schedule_start;
+                    let endReq = req.body.schedule_end;
 
-                let dayReq = req.body.schedule_day;
-                let startReq = req.body.schedule_start;
-                let endReq = req.body.schedule_end;
+                    if (
+                        new Date(dayDB).toDateString() ===
+                        new Date(dayReq).toDateString()
+                    ) {
 
-                if (
-                    new Date(dayDB).toDateString() ===
-                    new Date(dayReq).toDateString()
-                ) {
+                        let startDBTime = new Date(`1970-01-01T${startDB}`);
+                        let endDBTime = new Date(`1970-01-01T${endDB}`);
 
-                    let startDBTime = new Date(`1970-01-01T${startDB}`);
-                    let endDBTime = new Date(`1970-01-01T${endDB}`);
+                        let startReqTime = new Date(`1970-01-01T${startReq}`);
+                        let endReqTime = new Date(`1970-01-01T${endReq}`);
 
-                    let startReqTime = new Date(`1970-01-01T${startReq}`);
-                    let endReqTime = new Date(`1970-01-01T${endReq}`);
+                        if (startReqTime < endDBTime && endReqTime > startDBTime) {
+                            console.log("JADWAL BENTROK");
+                            isSchedule_Clash = true;
+                            break;
+                        }
 
-                    if (startReqTime < endDBTime && endReqTime > startDBTime) {
-                        console.log("JADWAL BENTROK");
-                        isSchedule_Clash = true;
-                        break;
                     }
-
                 }
-            }
 
-            if (isSchedule_Clash) {
-                return res.status(400).json({
-                    message: `Teacher with id ${teacherId} has a schedule clash on ${req.body.schedule_day} from ${req.body.schedule_start} to ${req.body.schedule_end}`
-                });
+                if (isSchedule_Clash) {
+                    return res.status(400).json({
+                        message: `Teacher with id ${teacherId} has a schedule clash on ${req.body.schedule_day} from ${req.body.schedule_start} to ${req.body.schedule_end}`
+                    });
+                } else {
+                    const data = await Class.create({
+                        subject_id: req.body.subject_id,
+                        teacher_id: req.body.teacher_id,
+                        max_capacity: req.body.max_capacity,
+                        schedule_day: req.body.schedule_day,
+                        schedule_start: req.body.schedule_start,
+                        schedule_end: req.body.schedule_end,
+                        room: req.body.room,
+                        status: req.body.status,
+                    }, { transaction: t });
+
+                    await t.commit();
+
+                    res.status(201).json({
+                        message: "Class added successfully",
+                        data: data
+                    });
+                }
             } else {
                 const data = await Class.create({
                     subject_id: req.body.subject_id,
@@ -117,9 +130,11 @@ class ClassController {
 
                 res.status(201).json({
                     message: "Class added successfully",
-                    // data: data
+                    data: data
                 });
             }
+
+
         } catch (error) {
             await t.rollback();
             res.status(400).json({

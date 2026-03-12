@@ -9,11 +9,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-
       request_code: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true,  
+        allowNull: false 
       },
-
       student_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -24,7 +24,6 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-
       class_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -35,24 +34,19 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-
       requested_at: {
         type: Sequelize.DATE
       },
-
       status: {
         type: Sequelize.ENUM('pending', 'enrolled', 'waitlisted', 'rejected', 'cancelled'),
       },
-
       allow_waitlist: {
         type: Sequelize.BOOLEAN
       },
-
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
-
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE

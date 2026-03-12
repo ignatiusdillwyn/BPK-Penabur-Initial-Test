@@ -33,7 +33,9 @@ module.exports = {
       },
 
       enrolled_at: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
       },
 
       createdAt: {

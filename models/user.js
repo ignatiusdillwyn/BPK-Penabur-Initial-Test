@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       email: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true, // Menambahkan constraint unique di level database
         validate: {
           notNull: {
             msg: "Email tidak boleh null"
@@ -26,6 +27,14 @@ module.exports = (sequelize, DataTypes) => {
           isString(value) {
             if (typeof value !== "string") {
               throw new Error("Email harus berupa string");
+            }
+          },
+          isUnique: async function (value) {
+            const user = await User.findOne({
+              where: { email: value }
+            });
+            if (user && user.id !== this.id) {
+              throw new Error("Email sudah digunakan");
             }
           }
         }
@@ -54,6 +63,5 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'User'
     }
   );
-
   return User;
 };

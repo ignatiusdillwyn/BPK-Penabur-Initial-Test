@@ -10,20 +10,25 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       student_number: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       grade_level: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       priority_level: {
         type: Sequelize.ENUM('regular', 'scholarship', 'special_program'),
         allowNull: false
       },
       status: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       credit: {
         type: Sequelize.INTEGER,

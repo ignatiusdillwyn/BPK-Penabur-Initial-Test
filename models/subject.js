@@ -15,9 +15,46 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Subject.init({
-    subject_code: DataTypes.STRING,
-    subject_name: DataTypes.STRING,
-    credit: DataTypes.INTEGER
+    subject_code: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: "subject_code cannot be empty"
+        },
+        isUnique: async function(value) {
+          const subject = await Subject.findOne({
+            where: { subject_code: value }
+          });
+          if (subject && subject.id !== this.id) {
+            throw new Error('subject_code must be unique');
+          }
+        }
+      }
+    },
+    subject_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: "subject_name cannot be empty"
+        }
+      }
+    },
+    credit: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isInt: {
+          msg: "credit must be an integer"
+        },
+        min: {
+          args: [1], // Mengubah dari 0 menjadi 1
+          msg: "credit cannot be below 1"
+        }
+      }
+    }
   }, {
     sequelize,
     modelName: 'Subject',

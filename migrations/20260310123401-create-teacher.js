@@ -10,13 +10,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false 
       },
       subject_speciality: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false 
       },
       status: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false 
       },
       createdAt: {
         allowNull: false,

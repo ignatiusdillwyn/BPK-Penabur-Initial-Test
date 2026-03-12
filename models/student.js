@@ -20,13 +20,21 @@ module.exports = (sequelize, DataTypes) => {
     student_number: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true, // Menambahkan constraint unique di level database
       validate: {
         notEmpty: {
           msg: "student_number cannot be empty"
+        },
+        isUnique: async function (value) {
+          const student = await Student.findOne({
+            where: { student_number: value }
+          });
+          if (student && student.id !== this.id) {
+            throw new Error('student_number must be unique');
+          }
         }
       }
     },
-
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -36,7 +44,6 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-
     grade_level: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -46,7 +53,6 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-
     priority_level: {
       type: DataTypes.ENUM('regular', 'scholarship', 'special_program'),
       allowNull: false,
@@ -60,7 +66,6 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-
     status: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -70,13 +75,11 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-
     credit: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
     }
-
   }, {
     sequelize,
     modelName: 'Student',

@@ -11,6 +11,7 @@ module.exports = {
       },
       request_id: {
         type: Sequelize.INTEGER,
+        allowNull: false ,
         references: {
           model: 'EnrollmentRequest',   // nama tabel
           key: 'id'
@@ -20,6 +21,7 @@ module.exports = {
       },
       class_id: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
           model: 'Class',   // nama tabel
           key: 'id'
@@ -29,6 +31,7 @@ module.exports = {
       },
       student_id: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
           model: 'Student',   // nama tabel
           key: 'id'
@@ -37,7 +40,8 @@ module.exports = {
         onDelete: 'CASCADE'
       },
       position: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

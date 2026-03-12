@@ -9,7 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-
       subject_id: {
         type: Sequelize.INTEGER,
         references: {
@@ -17,7 +16,6 @@ module.exports = {
           key: 'id'
         },
       },
-
       teacher_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -28,40 +26,31 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       },
-
       max_capacity: {
         type: Sequelize.INTEGER
       },
-
       current_capacity: {
         type: Sequelize.INTEGER
       },
-
       schedule_day: {
         type: Sequelize.DATE
       },
-
       schedule_start: {
         type: Sequelize.TIME
       },
-
       schedule_end: {
         type: Sequelize.TIME
       },
-
       room: {
         type: Sequelize.STRING
       },
-
       status: {
         type: Sequelize.STRING
       },
-
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
-
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
