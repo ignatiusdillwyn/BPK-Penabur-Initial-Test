@@ -127,6 +127,12 @@ class StudentController {
 
             const data = await Enrollment.findAll(options);
 
+            if (data.length === 0) {
+                return res.status(404).json({
+                    message: "No enrollments found for this student"
+                });
+            }
+
             await t.commit();
 
             res.status(200).json({
