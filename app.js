@@ -36,12 +36,6 @@ const cors = require('cors');
 // Untuk mengizinkan semua origin
 app.use(cors());
 
-// Atau untuk mengizinkan origin tertentu
-app.use(cors({
-  origin: 'http://localhost:5173', // Frontend origin
-  // credentials: true // Jika menggunakan cookies/auth
-}));
-
 app.use(routes)
 
 app.listen(port, () => {
