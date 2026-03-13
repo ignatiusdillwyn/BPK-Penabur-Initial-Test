@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "vercel-build": "npm install pg pg-hstore --save"
+    "vercel-build": "npm install pg@8.11.0 pg-hstore@2.3.4 --save && echo 'Build complete'"
   },
   "keywords": [],
   "author": "",
