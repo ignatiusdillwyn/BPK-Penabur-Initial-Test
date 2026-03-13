@@ -48,6 +48,8 @@ const enrollmentRouter = require("express").Router();
  *         description: Validation error
  *       401:
  *         description: Unauthorized
+ *       409:
+ *         description: Duplicate enrollment request (idempotency key already used)
  */
 enrollmentRouter.post(
     "/enrollment-requests",

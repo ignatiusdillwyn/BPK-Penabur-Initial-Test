@@ -36,12 +36,9 @@ class UserController {
 
   static async add(req, res) {
     try {
-      // console.log("req.body:", req.body);
-
       let { email, password } = req.body;
       password = encryptPwd(password);
 
-      // console.log("Encrypted Password:", password);
       const user = await User.create({
         email,
         password,

@@ -41,8 +41,6 @@ class ClassController {
     static async addClass(req, res) {
         const t = await Class.sequelize.transaction();
         try {
-            console.log('add class');
-
             //Cek apakah jadwal guru bertabrakan dengan kelas lain
             let teacherId = req.body.teacher_id;
 
@@ -54,7 +52,6 @@ class ClassController {
             };
 
             const dataClassFromDB = await Class.findAll(options);
-            console.log('data classsss teacher ', dataClassFromDB);
 
             if (dataClassFromDB.length !== 0) {
                 let isSchedule_Clash = false;
@@ -83,7 +80,7 @@ class ClassController {
                         let endReqTime = new Date(`1970-01-01T${endReq}`);
 
                         if (startReqTime < endDBTime && endReqTime > startDBTime) {
-                            console.log("JADWAL BENTROK");
+                            console.log("schedule clash");
                             isSchedule_Clash = true;
                             break;
                         }
@@ -146,8 +143,6 @@ class ClassController {
     static async getClassById(req, res) {
         const t = await Class.sequelize.transaction();
         try {
-            console.log('get class by id ', req.params.id);
-
             let classId = req.params.id;
 
             const data = await Class.findByPk(classId, {
@@ -180,8 +175,6 @@ class ClassController {
     static async getClassWaitlistById(req, res) {
         const t = await Waitlist.sequelize.transaction();
         try {
-            console.log('get class waitlist by id ', req.params.id);
-
             let classId = req.params.id;
             let { limit, offset } = req.query;
 
@@ -210,7 +203,6 @@ class ClassController {
 
             const datasWaitlist = await Waitlist.findAll(options);
 
-
             if (datasWaitlist.length === 0) {
                 await t.rollback();
                 return res.status(404).json({
@@ -221,14 +213,6 @@ class ClassController {
             await t.commit();
 
             //Sort data waitlist priority
-            console.log("Data waitlist before sorting: ", datasWaitlist);
-
-            // datasWaitlist.forEach(data => {
-            //     let dataStudent = data.dataValues.Student;
-
-            //     console.log("Data student: ", dataStudent.dataValues.priority_level);
-            // });
-
             const priorityOrder = {
                 special_program: 1,
                 scholarship: 2,
@@ -241,16 +225,6 @@ class ClassController {
                 let priorityB = priorityOrder[b.dataValues.Student.dataValues.priority_level];
 
                 return priorityA - priorityB;
-
-            });
-
-            datasWaitlist.forEach(data => {
-
-                let dataStudent = data.dataValues.Student;
-
-                console.log("Student name:", dataStudent.dataValues.name);
-                console.log("Priority level:", dataStudent.dataValues.priority_level);
-
             });
 
             res.status(200).json({

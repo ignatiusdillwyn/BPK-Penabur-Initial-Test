@@ -11,7 +11,6 @@ class EnrollmentController {
             const idempotencyKey = req.headers["idempotency-key"];
 
             if (!idempotencyKey) {
-                await t.rollback();
                 return res.status(400).json({
                     message: "Idempotency-Key header is required"
                 });
@@ -24,15 +23,15 @@ class EnrollmentController {
             });
 
             if (existingKey) {
-                await t.rollback();
-                return res.status(200).json(existingKey.response);
+                return res.status(409).json({
+                    message: 'idempotency key has been used',
+                    key: existingKey.key
+                });
             }
 
-            console.log('add enrollment request');
             let dataEnrollmentRequest = null
             //Get Class by Id
             let classId = req.body.class_id;
-
             let dataClass = await Class.findByPk(classId, {
                 include: [
                     {
@@ -43,24 +42,18 @@ class EnrollmentController {
                 transaction: t
             });
 
-            console.log('data classsss ', dataClass);
-
-
-            let studentId = req.body.student_id;
-
             //Get Student by Id
+            let studentId = req.body.student_id;
             const dataStudent = await Student.findByPk(studentId, {
                 transaction: t
             });
 
-            console.log('data student ', dataStudent);
             let subject = dataClass.Subject;
             let studentCredit = dataStudent.credit
             let subjectCredit = subject.dataValues.credit
 
             //Cek Credit Siswa
             if (studentCredit + subjectCredit > 24) {
-                console.log('Tidak bisa ambil kelas ini karena melebihi batas maksimal kredit')
                 dataEnrollmentRequest = await EnrollmentRequest.create({
                     request_code: req.body.request_code,
                     student_id: req.body.student_id,
@@ -76,7 +69,7 @@ class EnrollmentController {
                     data: dataEnrollmentRequest
                 }
 
-                //Create idempotency key
+                //Store idempotency key
                 await IdempotencyKey.create({
                     key: idempotencyKey,
                     response: response
@@ -93,7 +86,6 @@ class EnrollmentController {
             let dataWaitlist = null
             //Kalau Kelas Penuh
             if (class_current_capacity + 1 > class_max_capacity) {
-                console.log('Kelas penuh, masuk waiting list')
                 //Insert ke enrollment request
                 dataEnrollmentRequest = await EnrollmentRequest.create({
                     request_code: req.body.request_code,
@@ -105,7 +97,6 @@ class EnrollmentController {
                 }, { transaction: t });
 
                 //Insert ke waitlist
-                console.log('sudentd iddddd ', req.body.student_id);
                 dataWaitlist = await Waitlist.create({
                     request_id: dataEnrollmentRequest.id,
                     class_id: req.body.class_id,
@@ -143,7 +134,6 @@ class EnrollmentController {
                     ],
                     transaction: t
                 });
-                console.log('data enrollment request by student id ', dataEnrollmentRequestByStudentId);
 
                 for (const data of dataEnrollmentRequestByStudentId) {
 
@@ -170,7 +160,6 @@ class EnrollmentController {
 
                 //Kalau Jadwal Tabrakan
                 if (isSchedule_Clash) {
-                    console.log('gak bisa ambil kelas ini karena jadwal bentrok')
                     dataEnrollmentRequest = await EnrollmentRequest.create({
                         request_code: req.body.request_code,
                         student_id: req.body.student_id,
@@ -196,7 +185,7 @@ class EnrollmentController {
 
                     return res.status(201).json(response);
                 } else {
-                    console.log('Kelas masih ada kapasitas dan jadwal tidak bertabarakan, langsung enroll')
+                    //Kalau kelas masih ada kapasitas dan jadwal tidak bertabarakan
                     dataEnrollmentRequest = await EnrollmentRequest.create({
                         request_code: req.body.request_code,
                         student_id: req.body.student_id,
@@ -233,8 +222,6 @@ class EnrollmentController {
     static async cancelEnrollment(req, res) {
         const t = await EnrollmentRequest.sequelize.transaction();
         try {
-            console.log('cancel enrollment by id ', req.params.id);
-
             let enrollmentReqId = req.params.id;
 
             const data = await EnrollmentRequest.findByPk(enrollmentReqId);
@@ -290,7 +277,6 @@ class EnrollmentController {
                 data: data
             });
         } catch (error) {
-
             await t.rollback();
 
             res.status(500).json({

@@ -5,8 +5,6 @@ class StudentController {
     static async getAllStudents(req, res) {
         const t = await Student.sequelize.transaction();
         try {
-            console.log('get all students');
-
             let { limit, offset } = req.query;
 
             let options = {
@@ -43,8 +41,6 @@ class StudentController {
     static async addStudent(req, res) {
         const t = await Student.sequelize.transaction();
         try {
-            console.log('add student');
-
             const data = await Student.create({
                 student_number: req.body.student_number,
                 name: req.body.name,
@@ -70,8 +66,6 @@ class StudentController {
     static async getStudentById(req, res) {
         const t = await Student.sequelize.transaction();
         try {
-            console.log('get student by id ', req.params.id);
-
             let studentId = req.params.id;
 
             const data = await Student.findByPk(studentId, {
@@ -105,8 +99,6 @@ class StudentController {
         const t = await Enrollment.sequelize.transaction();
 
         try {
-            console.log('get student enrollments');
-
             let { limit, offset } = req.query;
             let studentId = req.params.id;
 
