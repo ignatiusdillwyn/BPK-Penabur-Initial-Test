@@ -128,6 +128,16 @@ studentRouter.get(
  *         schema:
  *           type: integer
  *         description: Student ID
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: offset
+ *         required: false
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: Student enrollments retrieved successfully
