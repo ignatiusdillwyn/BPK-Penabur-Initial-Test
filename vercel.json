@@ -1,18 +1,35 @@
 {
     "version": 2,
     "builds": [
-        {
-            "src": "app.js",
-            "use": "@vercel/node"
+      {
+        "src": "app.js",
+        "use": "@vercel/node",
+        "config": {
+          "includeFiles": [
+            "node_modules/**",
+            "config/**",
+            "models/**",
+            "routes/**"
+          ]
         }
+      }
     ],
     "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "app.js"
-        }
-    ],
-    "env": {
-        "NODE_ENV": "production"
-    }
-}
+      {
+        "src": "/health",
+        "dest": "app.js"
+      },
+      {
+        "src": "/api-docs/(.*)",
+        "dest": "app.js"
+      },
+      {
+        "src": "/api/(.*)",
+        "dest": "app.js"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "app.js"
+      }
+    ]
+  }
