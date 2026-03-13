@@ -4,6 +4,7 @@ const swaggerUi = require("swagger-ui-express")
 const app = express()
 const port = 3000
 const routes = require('./routes')
+require('dotenv').config();
 
 const options = {
   definition: {
@@ -41,3 +42,5 @@ app.use(routes)
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+module.exports = app;
