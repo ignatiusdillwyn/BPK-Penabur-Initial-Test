@@ -83,6 +83,18 @@ module.exports = (sequelize, DataTypes) => {
         },
         isDate: {
           msg: "schedule_day must be a valid date"
+        },
+        isFutureOrToday(value) {
+          const inputDate = new Date(value);
+          const today = new Date();
+          
+          // Reset time part untuk perbandingan tanggal saja
+          inputDate.setHours(0, 0, 0, 0);
+          today.setHours(0, 0, 0, 0);
+          
+          if (inputDate < today) {
+            throw new Error('schedule_day cannot be in the past');
+          }
         }
       }
     },
@@ -93,6 +105,13 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notNull: {
           msg: "schedule_start cannot be null"
+        },
+        isValidTimeFormat(value) {
+          // Regex untuk format TIME (HH:MM:SS atau HH:MM)
+          const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
+          if (!timeRegex.test(value)) {
+            throw new Error('schedule_start must be in HH:MM or HH:MM:SS format');
+          }
         }
       }
     },
@@ -103,6 +122,26 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notNull: {
           msg: "schedule_end cannot be null"
+        },
+        isValidTimeFormat(value) {
+          const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
+          if (!timeRegex.test(value)) {
+            throw new Error('schedule_end must be in HH:MM or HH:MM:SS format');
+          }
+        },
+        isAfterStart(value) {
+          if (!this.schedule_start) return;
+          
+          // Konversi ke menit untuk perbandingan
+          const startParts = this.schedule_start.split(':').map(Number);
+          const endParts = value.split(':').map(Number);
+          
+          const startMinutes = startParts[0] * 60 + (startParts[1] || 0);
+          const endMinutes = endParts[0] * 60 + (endParts[1] || 0);
+          
+          if (endMinutes <= startMinutes) {
+            throw new Error('schedule_end must be after schedule_start');
+          }
         }
       }
     },

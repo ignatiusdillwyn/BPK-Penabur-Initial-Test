@@ -55,11 +55,11 @@ class ClassController {
 
             if (dataClassFromDB.length !== 0) {
                 //Cek jadwal mulai harus lebih kecil dari jadwal selesai
-                if (req.body.schedule_start > req.body.schedule_end) {
-                    return res.status(400).json({
-                        message: "Schedule end time must be greater than schedule start time"
-                    });
-                }
+                // if (req.body.schedule_start > req.body.schedule_end) {
+                //     return res.status(400).json({
+                //         message: "Schedule end time must be greater than schedule start time"
+                //     });
+                // }
 
                 let isSchedule_Clash = false;
 
