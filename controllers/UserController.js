@@ -81,6 +81,14 @@ class UserController {
     try {
       const { email, password } = req.body;
 
+      if (!email) {
+        return res.status(401).json({ message: "Email cannot be empty" });
+      }
+
+      if (!password) {
+        return res.status(401).json({ message: "Password cannot be empty" });
+      }
+
       const user = await User.findOne({ where: { email } });
 
       if (!user) {
